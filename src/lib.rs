@@ -29,7 +29,7 @@ extern "C" fn solve(day: usize, str: *mut JSString) -> bool {
         .map_or_else(|e| (false, String::from(e)), |r| (true, r));
     unsafe {
         (*str).len = output.len();
-        (*str).data = Box::into_raw(output.into_boxed_str()) as *mut u8;
+        (*str).data = Box::leak(output.into_boxed_str()).as_mut_ptr();
     }
     ok
 }
