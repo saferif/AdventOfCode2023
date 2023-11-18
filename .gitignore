@@ -1,4 +1,5 @@
 /www/advent_of_code.wasm
+/.cargo
 /target
 /Cargo.lock
 .DS_Store

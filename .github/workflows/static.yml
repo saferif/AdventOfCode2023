@@ -27,15 +27,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin
-            ~/.cargo/git
-            ~/.cargo/registry
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install target
         run: rustup target add wasm32-unknown-unknown
       - name: Build
@@ -46,6 +37,7 @@ jobs:
           name: wasm
           path: target/wasm32-unknown-unknown/release/advent_of_code.wasm
           if-no-files-found: error
+          retention-days: 1
   # Single deploy job since we're just deploying
   deploy:
     environment:
