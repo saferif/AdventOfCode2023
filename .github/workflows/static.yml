@@ -54,11 +54,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
           name: wasm
-          path: www/advent_of_code.wasm
+          path: www
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
