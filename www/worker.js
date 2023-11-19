@@ -11,8 +11,9 @@ onmessage = async (e) => {
     new Uint8Array(wasm.exports.memory.buffer, str_ptr, buf.length).set(buf);
     parts[0] = str_ptr;
     parts[1] = buf.length;
-    const ok = wasm.exports.solve(parseInt(e.data[0]), parts_ptr);
-    const output_buf = new Uint8Array(wasm.exports.memory.buffer, parts[0], parts[1]);
+    const ok = wasm.exports.solve(e.data[0], parts_ptr);
+    const output_parts = new Uint32Array(wasm.exports.memory.buffer, parts_ptr, 2);
+    const output_buf = new Uint8Array(wasm.exports.memory.buffer, output_parts[0], output_parts[1]);
     const output = decoder.decode(output_buf);
     wasm.exports.dealloc(parts[0], parts[1]);
     wasm.exports.dealloc(parts_ptr, 8);

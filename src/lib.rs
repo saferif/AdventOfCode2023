@@ -1,8 +1,8 @@
 #![no_std]
 
 mod allocation;
-mod day0;
 mod day1;
+mod day2;
 mod error;
 
 extern crate alloc;
@@ -12,7 +12,8 @@ use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::String;
 
-static SOLUTIONS: [fn(String) -> Result<String, AoCError>; 2] = [day0::solve, day1::solve];
+static SOLUTIONS: &[fn(String) -> Result<String, AoCError>] =
+    &[day1::part1, day1::part2, day2::part1, day2::part2];
 
 #[repr(C, packed)]
 struct JSString {
@@ -21,11 +22,11 @@ struct JSString {
 }
 
 #[no_mangle]
-extern "C" fn solve(day: usize, str: *mut JSString) -> bool {
+extern "C" fn solve(index: usize, str: *mut JSString) -> bool {
     let input = unsafe { String::from_raw_parts((*str).data, (*str).len, (*str).len) };
     let (ok, output) = SOLUTIONS
-        .get(day)
-        .map_or(Err(format!("Invalid day {}", day).into()), |f| f(input))
+        .get(index)
+        .map_or(Err(format!("Invalid index {}", index).into()), |f| f(input))
         .map_or_else(|e| (false, String::from(e)), |r| (true, r));
     unsafe {
         (*str).len = output.len();
