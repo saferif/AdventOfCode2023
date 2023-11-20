@@ -36,7 +36,7 @@ function exec() {
     const input = document.getElementById("input").value;
     const part1 = handleOutput(solveAsync(worker1, 2 * day, input), output1);
     const part2 = handleOutput(solveAsync(worker2, 2 * day + 1, input), output2);
-    Promise.all([part1, part2]).finally(() => {
+    return Promise.all([part1, part2]).finally(() => {
         solveBtn.classList.remove("inProgress");
         document.body.style.cursor = "default";
     });
