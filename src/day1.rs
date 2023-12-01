@@ -1,36 +1,35 @@
 use crate::error::AoCError;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::num::ParseIntError;
+
+const DIGITS: &[&'static str] = &[
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "one", "two", "three", "four", "five", "six",
+    "seven", "eight", "nine",
+];
+
+fn solve(input: String, digits: &[&str]) -> Result<String, AoCError> {
+    let calibrations = input
+        .trim()
+        .lines()
+        .map(|calibration| {
+            let mut it = (0..calibration.len()).filter_map(|start| {
+                digits
+                    .iter()
+                    .position(|digit| calibration[start..].starts_with(digit))
+                    .map(|digit| digit % 9 + 1)
+            });
+            let first = it.next().ok_or(AoCError::from("no digits"))?;
+            let last = it.next_back().unwrap_or(first);
+            Ok(first * 10 + last)
+        })
+        .collect::<Result<Vec<usize>, AoCError>>()?;
+    Ok(calibrations.into_iter().sum::<usize>().to_string())
+}
 
 pub(crate) fn part1(input: String) -> Result<String, AoCError> {
-    let elfs = input
-        .trim()
-        .split("\n\n")
-        .map(|elf| {
-            let weights = elf
-                .split("\n")
-                .map(|weight| weight.parse::<u64>())
-                .collect::<Result<Vec<u64>, _>>()?;
-            Ok(weights.into_iter().sum())
-        })
-        .collect::<Result<Vec<u64>, ParseIntError>>()?;
-    Ok(elfs.into_iter().max().unwrap_or(0).to_string())
+    solve(input, &DIGITS[..9])
 }
 
 pub(crate) fn part2(input: String) -> Result<String, AoCError> {
-    let mut elfs = input
-        .trim()
-        .split("\n\n")
-        .map(|elf| {
-            let weights = elf
-                .split("\n")
-                .map(|weight| weight.parse::<u64>())
-                .collect::<Result<Vec<u64>, _>>()?;
-            Ok(weights.into_iter().sum())
-        })
-        .collect::<Result<Vec<u64>, ParseIntError>>()?;
-    elfs.sort();
-    elfs.reverse();
-    Ok(elfs[..3].into_iter().sum::<u64>().to_string())
+    solve(input, DIGITS)
 }
