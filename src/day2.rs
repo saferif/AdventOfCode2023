@@ -1,66 +1,74 @@
 use crate::error::AoCError;
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-
-fn points(turn: &str) -> Option<u64> {
-    match turn {
-        "A" | "X" => Some(1),
-        "B" | "Y" => Some(2),
-        "C" | "Z" => Some(3),
-        _ => None,
-    }
-}
-
-fn round(my: u64, other: u64) -> u64 {
-    if my == other {
-        3
-    } else if (my == 2 && other == 1) || (my == 3 && other == 2) || (my == 1 && other == 3) {
-        6
-    } else {
-        0
-    }
-}
-
-fn choose(other: u64, result: &str) -> u64 {
-    let win = other % 3 + 1;
-    let loss = 6 - win - other;
-    if result == "X" {
-        loss
-    } else if result == "Y" {
-        other
-    } else {
-        win
-    }
-}
+use core::cmp::max;
 
 pub(crate) fn part1(input: String) -> Result<String, AoCError> {
-    let points = input
+    let bag: BTreeMap<&str, u32> = BTreeMap::from([("red", 12), ("green", 13), ("blue", 14)]);
+    let games = input
         .trim()
         .lines()
-        .map(|line| {
-            let (other, my) = line
-                .split_once(" ")
-                .ok_or(AoCError::from("invalid line format"))?;
-            let other = points(other).ok_or(AoCError::from("invalid value of other"))?;
-            let my = points(my).ok_or(AoCError::from("invalid value of my"))?;
-            Ok(round(my, other) + my)
+        .map(|game| {
+            let (id, game) = game
+                .split_once(": ")
+                .ok_or(AoCError::from("invalid format"))?;
+            let id = id.trim_start_matches("Game ").parse::<u32>()?;
+            let results = game
+                .split("; ")
+                .map(|rounds| {
+                    let rounds = parse_rounds(rounds)?;
+                    Ok(rounds
+                        .into_iter()
+                        .all(|round| bag.get(round.0).map(|cnt| *cnt >= round.1).unwrap_or(false)))
+                })
+                .collect::<Result<Vec<bool>, AoCError>>()?;
+            Ok(if results.into_iter().all(|r| r) {
+                id
+            } else {
+                0
+            })
         })
-        .collect::<Result<Vec<u64>, AoCError>>()?;
-    Ok(points.into_iter().sum::<u64>().to_string())
+        .collect::<Result<Vec<u32>, AoCError>>()?;
+    Ok(games.into_iter().sum::<u32>().to_string())
 }
 
 pub(crate) fn part2(input: String) -> Result<String, AoCError> {
-    let points = input
+    let games = input
         .trim()
         .lines()
-        .map(|line| {
-            let (other, result) = line
-                .split_once(" ")
-                .ok_or(AoCError::from("invalid line format"))?;
-            let other = points(other).ok_or(AoCError::from("invalid value of other"))?;
-            let my = choose(other, result);
-            Ok(round(my, other) + my)
+        .map(|game| {
+            let (_, game) = game
+                .split_once(": ")
+                .ok_or(AoCError::from("invalid format"))?;
+            let mut bag: BTreeMap<&str, u32> =
+                BTreeMap::from([("red", 0), ("green", 0), ("blue", 0)]);
+            game.split("; ")
+                .map(|rounds| {
+                    let rounds = parse_rounds(rounds)?;
+                    rounds.into_iter().for_each(|round| {
+                        bag.get_mut(round.0)
+                            .into_iter()
+                            .for_each(|v| *v = max(*v, round.1))
+                    });
+                    Ok(())
+                })
+                .collect::<Result<Vec<()>, AoCError>>()?;
+            Ok(bag.into_values().fold(1, |a, v| a * v))
         })
-        .collect::<Result<Vec<u64>, AoCError>>()?;
-    Ok(points.into_iter().sum::<u64>().to_string())
+        .collect::<Result<Vec<u32>, AoCError>>()?;
+    Ok(games.into_iter().sum::<u32>().to_string())
+}
+
+fn parse_rounds(rounds: &str) -> Result<Vec<(&str, u32)>, AoCError> {
+    rounds
+        .split(", ")
+        .map(|cubes| {
+            let (cnt, color) = cubes
+                .split_once(" ")
+                .ok_or(AoCError::from("invalid format"))?;
+            let cnt = cnt.parse::<u32>()?;
+            Ok((color, cnt))
+        })
+        .collect::<Result<Vec<(&str, u32)>, AoCError>>()
 }
