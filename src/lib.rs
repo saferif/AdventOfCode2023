@@ -3,6 +3,7 @@
 mod allocation;
 mod day1;
 mod day2;
+mod day3;
 mod error;
 
 extern crate alloc;
@@ -12,8 +13,14 @@ use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::String;
 
-static SOLUTIONS: &[fn(String) -> Result<String, AoCError>] =
-    &[day1::part1, day1::part2, day2::part1, day2::part2];
+static SOLUTIONS: &[fn(String) -> Result<String, AoCError>] = &[
+    day1::part1,
+    day1::part2,
+    day2::part1,
+    day2::part2,
+    day3::part1,
+    day3::part2,
+];
 
 #[repr(C, packed)]
 struct JSString {
