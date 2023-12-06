@@ -14,16 +14,17 @@ pub(crate) fn part1(input: String) -> Result<String, AoCError> {
             let winning = winning
                 .trim()
                 .split(" ")
-                .filter(|card|!card.is_empty())
+                .filter(|card| !card.is_empty())
                 .map(|card| card.parse::<u32>())
                 .collect::<Result<BTreeSet<u32>, ParseIntError>>()?;
             let have = have
                 .trim()
                 .split(" ")
-                .filter(|card|!card.is_empty())
+                .filter(|card| !card.is_empty())
                 .map(|card| card.parse::<u32>())
                 .collect::<Result<Vec<u32>, ParseIntError>>()?;
-            Ok(have.into_iter()
+            Ok(have
+                .into_iter()
                 .filter(|card| winning.contains(card))
                 .count())
         })
@@ -43,27 +44,34 @@ pub(crate) fn part2(input: String) -> Result<String, AoCError> {
         .lines()
         .map(|line| {
             let (id, cards) = line.split_once(":").ok_or(AoCError::from("no cards"))?;
-            let id = id.split(" ").last().ok_or(AoCError::from("invalid card ID"))?;
+            let id = id
+                .split(" ")
+                .last()
+                .ok_or(AoCError::from("invalid card ID"))?;
             let id = id.parse::<usize>()?;
             let card_count = *counts.entry(id).or_insert(1);
             let (winning, have) = cards.split_once("|").ok_or(AoCError::from("no winning"))?;
             let winning = winning
                 .trim()
                 .split(" ")
-                .filter(|card|!card.is_empty())
+                .filter(|card| !card.is_empty())
                 .map(|card| card.parse::<u32>())
                 .collect::<Result<BTreeSet<u32>, ParseIntError>>()?;
             let have = have
                 .trim()
                 .split(" ")
-                .filter(|card|!card.is_empty())
+                .filter(|card| !card.is_empty())
                 .map(|card| card.parse::<u32>())
                 .collect::<Result<Vec<u32>, ParseIntError>>()?;
-            let winning_count = have.into_iter()
+            let winning_count = have
+                .into_iter()
                 .filter(|card| winning.contains(card))
                 .count();
             (0..winning_count).for_each(|i| {
-               counts.entry(id + i + 1).and_modify(|v| *v += card_count).or_insert(1 + card_count);
+                counts
+                    .entry(id + i + 1)
+                    .and_modify(|v| *v += card_count)
+                    .or_insert(1 + card_count);
             });
             Ok(())
         })
