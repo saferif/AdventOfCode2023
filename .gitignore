@@ -2,5 +2,6 @@
 /.cargo
 /target
 /Cargo.lock
+/inputs
 .DS_Store
 .idea
