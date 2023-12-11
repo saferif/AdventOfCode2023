@@ -1,6 +1,6 @@
-use alloc::collections::BTreeSet;
 use crate::day10::Direction::{East, North, South, West};
 use crate::error::AoCError;
+use alloc::collections::BTreeSet;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -67,15 +67,15 @@ pub(crate) fn part2(input: String) -> Result<String, AoCError> {
         ('L', [South, West]),
         ('J', [South, East]),
         ('7', [North, East]),
-        ('F', [North, West])]
-        .into_iter()
-        .filter_map(|(start_tile, directions)| {
-            run_map(&map, start_tile, directions[0], start_row, start_column).and_then(|_|{
-                run_map(&map, start_tile, directions[1], start_row, start_column)
-            })
-        })
-        .max_by_key(|v| v.1.len())
-        .ok_or(AoCError::from("no loop"))?;
+        ('F', [North, West]),
+    ]
+    .into_iter()
+    .filter_map(|(start_tile, directions)| {
+        run_map(&map, start_tile, directions[0], start_row, start_column)
+            .and_then(|_| run_map(&map, start_tile, directions[1], start_row, start_column))
+    })
+    .max_by_key(|v| v.1.len())
+    .ok_or(AoCError::from("no loop"))?;
     map[start_row][start_column] = start_tile;
 
     let inside = longest
