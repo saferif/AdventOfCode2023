@@ -17,6 +17,7 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
 
 extern crate alloc;
 
@@ -56,6 +57,8 @@ static SOLUTIONS: &[fn(String) -> Result<String, AoCError>] = &[
     day14::part2,
     day15::part1,
     day15::part2,
+    day16::part1,
+    day16::part2,
 ];
 
 #[repr(C, packed)]
