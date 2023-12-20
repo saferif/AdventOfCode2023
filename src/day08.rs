@@ -1,4 +1,5 @@
 use crate::error::AoCError;
+use crate::utils::lcm;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -56,26 +57,4 @@ fn solve<F: Fn(&&&str) -> bool>(input: String, starting: F) -> Result<String, Ao
         .map(|v| v as u64)
         .fold(1, lcm)
         .to_string())
-}
-
-fn gcd(x: u64, y: u64) -> u64 {
-    let z = x | y;
-    if x == 0 || y == 0 {
-        return z;
-    }
-    let e = z.trailing_zeros();
-    let mut x = x >> x.trailing_zeros();
-    let mut y = y >> y.trailing_zeros();
-    while x != y {
-        if x < y {
-            core::mem::swap(&mut x, &mut y);
-        }
-        x -= y;
-        x >>= x.trailing_zeros();
-    }
-    x << e
-}
-
-fn lcm(x: u64, y: u64) -> u64 {
-    x / gcd(x, y) * y
 }
