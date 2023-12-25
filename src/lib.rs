@@ -25,6 +25,7 @@ mod day21;
 mod day22;
 mod day23;
 mod day24;
+mod day25;
 mod error;
 mod utils;
 
@@ -84,6 +85,8 @@ static SOLUTIONS: &[fn(String) -> Result<String, AoCError>] = &[
     day23::part2,
     day24::part1,
     day24::part2,
+    day25::part1,
+    day25::part2,
 ];
 
 #[repr(C, packed)]
