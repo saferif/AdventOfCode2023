@@ -5,34 +5,43 @@ use alloc::vec::Vec;
 use core::cmp::Reverse;
 
 pub(crate) fn part1(input: String) -> Result<String, AoCError> {
-    solve(input, |direction, cnt| {
-        let mut new_directions = Vec::new();
-        if cnt < 3 {
-            new_directions.push((direction, cnt + 1));
-        }
-        new_directions.push(((direction.1, -direction.0), 1));
-        new_directions.push(((-direction.1, direction.0), 1));
-        new_directions
-    })
+    solve(
+        input,
+        |direction, cnt| {
+            let mut new_directions = Vec::new();
+            if cnt < 3 {
+                new_directions.push((direction, cnt + 1));
+            }
+            new_directions.push(((direction.1, -direction.0), 1));
+            new_directions.push(((-direction.1, direction.0), 1));
+            new_directions
+        },
+        None,
+    )
 }
 
 pub(crate) fn part2(input: String) -> Result<String, AoCError> {
-    solve(input, |direction, cnt| {
-        let mut new_directions = Vec::new();
-        if cnt < 10 {
-            new_directions.push((direction, cnt + 1));
-        }
-        if cnt >= 4 {
-            new_directions.push(((direction.1, -direction.0), 1));
-            new_directions.push(((-direction.1, direction.0), 1));
-        }
-        new_directions
-    })
+    solve(
+        input,
+        |direction, cnt| {
+            let mut new_directions = Vec::new();
+            if cnt < 10 {
+                new_directions.push((direction, cnt + 1));
+            }
+            if cnt >= 4 {
+                new_directions.push(((direction.1, -direction.0), 1));
+                new_directions.push(((-direction.1, direction.0), 1));
+            }
+            new_directions
+        },
+        Some(|key| key.2 >= 4),
+    )
 }
 
 fn solve<F: Fn((isize, isize), u8) -> Vec<((isize, isize), u8)>>(
     input: String,
     new_directions: F,
+    result_predicate: Option<fn(((usize, usize), (isize, isize), u8)) -> bool>,
 ) -> Result<String, AoCError> {
     let map = input
         .trim()
@@ -53,7 +62,13 @@ fn solve<F: Fn((isize, isize), u8) -> Vec<((isize, isize), u8)>>(
 
     let res = losses
         .into_iter()
-        .filter_map(|(key, value)| (key.0 == (n - 1, m - 1)).then_some(value))
+        .filter(|(key, _)| key.0 == (n - 1, m - 1))
+        .filter_map(|(key, value)| {
+            result_predicate
+                .into_iter()
+                .all(|f| f(key))
+                .then_some(value)
+        })
         .min()
         .unwrap_or(u32::MAX);
     Ok(res.to_string())
