@@ -182,8 +182,10 @@ fn try_z(
     stones
         .iter()
         .all(|stone| {
-            let collision_time = (stone.0 .2 - z_coord) / (z_speed - stone.1 .2);
-            position_at(stone, collision_time) == position_at(&our_stone, collision_time)
+            let collision_time = (stone.0 .2 - z_coord).checked_div(z_speed - stone.1 .2);
+            collision_time
+                .into_iter()
+                .all(|ct| position_at(stone, ct) == position_at(&our_stone, ct))
         })
         .then_some(x_coord + y_coord + z_coord)
 }
